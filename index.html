@@ -15,6 +15,10 @@
   <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <link rel="icon" href="data:;base64,=">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+  <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+  <link rel="stylesheet" href="https://raw.githubusercontent.com/CliffCloud/Leaflet.EasyButton/master/src/easy-button.css" />
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet" />
 </head>
 
 <style>
@@ -33,8 +37,26 @@ html,body{
 }
 
 .buttons{
-  text-align:center;
+  text-align:middle;
+  padding:10px;
   z-index:2;
+  position: absolute;
+  font-family: consolas, sans-serif;
+}
+
+.leaflet-top {
+  top: 50px;
+}
+
+.leaflet-popup-tip {
+    width: 0px;
+    height: 0px;
+}
+
+h1{
+  font-family: consolas, sans-serif;
+  color:#4D5656;
+  font-size:14px
 }
 
 </style>
@@ -46,24 +68,43 @@ html,body{
     <button type="button" class="btn btn-secondary" onclick="simplify()" id="simplify">Simplify</button>
   </div>
   <div id="mapid"></div>
+  <div id="sidebar">
+    <h1>leaflet-sidebar</h1>
+  </div>
 <script>
   // initialize map centered at calgary
-  var map = L.map('mapid').setView([51.035, -114.072], 11);
-  map.doubleClickZoom.disable();
+  var map = L.map('mapid').setView([51.035, -114.072], 11)
   // add mapbox tile layer streets
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
-    id: 'mapbox/streets-v11',
+    id: 'mapbox/light-v10',
     tileSize: 512,
     zoomOffset: -1,
     accessToken: 'pk.eyJ1Ijoiem9ld2Fsc2giLCJhIjoiY2trbGl2NzVmMWp2YjMxcTlpcmF3eXZ5YSJ9.UVZBfaC844oYgXMD0KlPDA'
   }).addTo(map);
 
+  // help popup content
+  var Popup = L.popup().setContent('<h1>Select <b>Draw</b> and then use mouse clicks to draw a polyline.<br></br>Once you are finished drawing your line, you can select <b>Simplify</b> to view the simplified version of your line.<br></br>You can select <b>Delete</b> to start over.</h1>');
+
+  // add question mark easy button that will trigger popup
+  L.easyButton('fa-question', function(btn, map){
+      Popup.setLatLng(map.getCenter()).openOn(map);
+  }).addTo(map)
+
+  // styles for drawn layer and simplified layer
+  var linestyle = {
+      "color": "#DE3163"
+  };
+
+  var simplifystyle = {
+      "color":"#6495ED"
+  };
+
   // initialize variables
-  var layer = L.geoJSON();
+  var layer = L.geoJSON([],{style:linestyle});
+  var layerS = L.geoJSON([],{style:simplifystyle});
   var geojsonfeature;
-  var geojsonsimple;
   var array = [];
   // disable delete and simplify buttons to start
   document.getElementById("delete").disabled = true;
@@ -100,9 +141,11 @@ html,body{
 
   // to delete the polyline
   function deleteline(){
-      // remove the layer and empty array
+      // remove the layers and empty the array
       map.removeLayer(layer);
+      map.removeLayer(layerS);
       layer.clearLayers();
+      layerS.clearLayers();
       array = [];
       // remove event listener for click
       map.removeEventListener("click");
@@ -123,8 +166,11 @@ html,body{
     var simplified = turf.simplify(line, options);
     console.log(simplified);
     // add to layer and map
-    layer.addData(simplified);
-    layer.addTo(map);
+    layerS.addData(simplified);
+    layerS.addTo(map);
+
+    // ditable simplify since it has already been clicked
+    document.getElementById("simplify").disabled = true;
   }
 
 </script>
