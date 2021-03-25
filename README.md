@@ -14,7 +14,7 @@ basic instructions for using the application. The question mark icon is created 
 simplified line layers so the user can distinguish them. When the user first visits the site, only the "Draw" button is enabled (since there is nothing to delete
 or simplify yet). They can select "Draw", and then click on the map to select the points that connect their polyline. Each time the mouse is clicked, the latitude
 and longitude are added to an array to store the polyline points. The array coordinates are added to a geojson variable, which is added to the layer and then added
-to the map. Once the user starts drawing, the "Draw" button becomes diabled and the "Delete" and "Simplify" buttons become enabled. When the user is done drawing
+to the map. Once the user starts drawing, the "Draw" button becomes disabled and the "Delete" and "Simplify" buttons become enabled. When the user is done drawing
 they can click "Simplify" or "Delete". The "Simplify" button will remove the click event listener and add the array of polyline coordinates to a Turf lineString.
 Then, Turf Simplify is used on the lineString to return the simplified line. The simplified line is added to a different layer and then added to the map. The
 "Simplify" button disables when it is clicked. The "Delete" button also removes the click event listener. It removes all layers from the map and empties the array
