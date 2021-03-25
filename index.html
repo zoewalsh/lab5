@@ -60,19 +60,25 @@ html,body{
     accessToken: 'pk.eyJ1Ijoiem9ld2Fsc2giLCJhIjoiY2trbGl2NzVmMWp2YjMxcTlpcmF3eXZ5YSJ9.UVZBfaC844oYgXMD0KlPDA'
   }).addTo(map);
 
+  // initialize variables
   var layer = L.geoJSON();
   var geojsonfeature;
   var geojsonsimple;
   var array = [];
+  // disable delete and simplify buttons to start
   document.getElementById("delete").disabled = true;
   document.getElementById("simplify").disabled = true;
 
+  // when draw button is selected
   function drawline(){
     map.addEventListener('click', function(e){
+      // get lat and long
       var lat = e.latlng.lat;
       var lng = e.latlng.lng;
       var line = [lng, lat];
+      // push to array
       array.push(line);
+      // create a geojson feature with the array coordinates
       geojsonfeature={
         "type": "Feature",
         "geometry": {
@@ -80,9 +86,11 @@ html,body{
           "coordinates":array
         }
       };
+      // add feature to layer and map
       layer.addData(geojsonfeature);
       layer.addTo(map);
 
+      // disable draw and enable delete and simplify
       document.getElementById("draw").disabled = true;
       document.getElementById("delete").disabled = false;
       document.getElementById("simplify").disabled = false;
@@ -90,25 +98,31 @@ html,body{
 
   }
 
+  // to delete the polyline
   function deleteline(){
+      // remove the layer and empty array
       map.removeLayer(layer);
       layer.clearLayers();
       array = [];
+      // remove event listener for click
       map.removeEventListener("click");
 
+      // enable draw and disable delete and simplify
       document.getElementById("draw").disabled = false;
       document.getElementById("delete").disabled = true;
       document.getElementById("simplify").disabled = true;
   }
 
   function simplify(){
+    // remove click event listener
     map.removeEventListener("click");
-    var options = {color: 'red'};
+    // add array to a turf linestring
     var line = turf.lineString(array);
     var options = {tolerance: 0.01, highQuality: false};
+    // ise turf simplify to simplify the line
     var simplified = turf.simplify(line, options);
     console.log(simplified);
-
+    // add to layer and map
     layer.addData(simplified);
     layer.addTo(map);
   }
