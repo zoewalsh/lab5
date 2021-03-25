@@ -103,6 +103,7 @@ h1{
   var layerS = L.geoJSON([],{style:simplifystyle});
   var geojsonfeature;
   var array = [];
+
   // disable delete and simplify buttons to start
   document.getElementById("delete").disabled = true;
   document.getElementById("simplify").disabled = true;
@@ -159,9 +160,8 @@ h1{
     // add array to a turf linestring
     var line = turf.lineString(array);
     var options = {tolerance: 0.01, highQuality: false};
-    // ise turf simplify to simplify the line
+    // use turf simplify to simplify the line
     var simplified = turf.simplify(line, options);
-    console.log(simplified);
     // add to layer and map
     layerS.addData(simplified);
     layerS.addTo(map);
