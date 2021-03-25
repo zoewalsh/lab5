@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Line Simplification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <link rel="icon" href="data:;base64,=">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.min.js" integrity="sha384-pQQkAEnwaBkjpqZ8RU1fF1AKtTcHJwFl3pblpTlHXybJjHpMYo79HY3hIi4NKxyj" crossorigin="anonymous"></script>
+  <script src='https://api.mapbox.com/mapbox.js/plugins/turf/v3.0.11/turf.min.js'></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <link rel="icon" href="data:;base64,=">
+</head>
+
+<style>
+
+#mapid {
+  position: absolute;
+  height:100%;
+  width:100%;
+  z-index:1;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  padding:0;
+}
+
+.buttons{
+  text-align:center;
+  z-index:2;
+}
+
+</style>
+
+<body>
+  <div class="buttons">
+    <button type="button" class="btn btn-primary" onclick="drawline()" id="button1">Draw</button>
+    <button type="button" class="btn btn-primary" onclick="deleteline()" id="button2">Delete</button>
+    <button type="button" class="btn btn-primary" onclick="simplify()" id="button3">Delete</button>
+  </div>
+  <div id="mapid"></div>
+<script>
+  // initialize map centered at calgary
+  var map = L.map('mapid').setView([51.035, -114.072], 11);
+  map.doubleClickZoom.disable();
+  // add mapbox tile layer streets
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox/streets-v11',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: 'pk.eyJ1Ijoiem9ld2Fsc2giLCJhIjoiY2trbGl2NzVmMWp2YjMxcTlpcmF3eXZ5YSJ9.UVZBfaC844oYgXMD0KlPDA'
+  }).addTo(map);
+
+  var layer = L.geoJSON();
+  var geojsonfeature;
+  var array = [];
+
+  function drawline(){
+    map.addEventListener('click', function(e){
+      var lat = e.latlng.lat;
+      var lng = e.latlng.lng;
+      var line = [lng, lat];
+      array.push(line);
+
+      geojsonfeature={
+        "type": "Feature",
+        "geometry": {
+          "type":"LineString",
+          "coordinates":array
+        }
+      };
+      layer.addData(geojsonfeature);
+      layer.addTo(map);
+    });
+  }
+
+  function deleteline(){
+      map.removeLayer(layer);
+      layer.clearLayers();
+      array = [];
+      map.removeEventListener("click");
+  }
+
+  function simplify(){
+    
+  }
+
+</script>
+</body>
+</html>
